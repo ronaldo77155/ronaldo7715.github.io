@@ -39,7 +39,7 @@
             outline: none;
             border-color: #6366f1; /* Indigo 500 */
         }
-        .search-button {
+        .search-button, .new-button { /* Apply similar styles to the new button */
             padding: 12px 25px;
             background-color: #6366f1; /* Indigo 500 */
             color: white;
@@ -50,11 +50,11 @@
             transition: background-color 0.3s ease, transform 0.1s ease;
             box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
         }
-        .search-button:hover {
+        .search-button:hover, .new-button:hover {
             background-color: #4f46e5; /* Indigo 600 */
             transform: translateY(-1px);
         }
-        .search-button:active {
+        .search-button:active, .new-button:active {
             transform: translateY(0);
         }
         .result-card {
@@ -95,6 +95,7 @@
         <div class="flex flex-col sm:flex-row gap-4 mb-8">
             <input type="text" id="searchInput" placeholder="물리 용어를 검색하세요 (예: 뉴턴, 상대성 이론)" class="search-input flex-grow">
             <button id="searchButton" class="search-button">검색</button>
+            <button id="newButton" class="new-button">새로운 버튼</button> <!-- New button added here -->
         </div>
 
         <div id="searchResults" class="space-y-4">
@@ -206,6 +207,7 @@
         // Get references to DOM elements
         const searchInput = document.getElementById('searchInput');
         const searchButton = document.getElementById('searchButton');
+        const newButton = document.getElementById('newButton'); // Reference to the new button
         const searchResultsDiv = document.getElementById('searchResults');
 
         /**
@@ -272,6 +274,11 @@
                 // Optional: Live search as user types (uncomment if desired)
                 // performSearch();
             }
+        });
+
+        // Add an event listener for the new button (example action)
+        newButton.addEventListener('click', () => {
+            alert('새로운 버튼이 클릭되었습니다!'); // You can change this action
         });
 
         // Initial display: Show all terms when the page loads
