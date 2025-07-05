@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>물리 사전</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for better content flow */
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            margin-top: 50px; /* Add some top margin */
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #6366f1; /* Indigo 500 */
+        }
+        .search-button {
+            padding: 12px 25px;
+            background-color: #6366f1; /* Indigo 500 */
+            color: white;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+        }
+        .search-button:hover {
+            background-color: #4f46e5; /* Indigo 600 */
+            transform: translateY(-1px);
+        }
+        .search-button:active {
+            transform: translateY(0);
+        }
+        .result-card {
+            background-color: #f8fafc; /* Slate 50 */
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+        .result-term {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a202c; /* Gray 900 */
+            margin-bottom: 8px;
+        }
+        .result-definition {
+            font-size: 1rem;
+            color: #4a5568; /* Gray 700 */
+            line-height: 1.6;
+        }
+        .no-results {
+            text-align: center;
+            color: #718096; /* Gray 500 */
+            font-size: 1.1rem;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">물리 사전</h1>
+
+        <div class="flex flex-col sm:flex-row gap-4 mb-8">
+            <input type="text" id="searchInput" placeholder="물리 용어를 검색하세요 (예: 뉴턴, 상대성 이론)" class="search-input flex-grow">
+            <button id="searchButton" class="search-button">검색</button>
+        </div>
+
+        <div id="searchResults" class="space-y-4">
+            <!-- Search results will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // Physics data: A collection of physics terms and their definitions
+        const physicsData = [
+            {
+                term: "뉴턴의 운동 법칙 (Newton's Laws of Motion)",
+                definition: "물체의 운동을 설명하는 세 가지 기본 법칙입니다. 제1법칙(관성의 법칙), 제2법칙(가속도의 법칙), 제3법칙(작용-반작용의 법칙)으로 구성됩니다."
+            },
+            {
+                term: "만유인력 법칙 (Law of Universal Gravitation)",
+                definition: "모든 질량을 가진 두 물체 사이에 작용하는 인력의 크기는 두 질량의 곱에 비례하고 거리의 제곱에 반비례한다는 법칙입니다."
+            },
+            {
+                term: "상대성 이론 (Theory of Relativity)",
+                definition: "알베르트 아인슈타인이 제안한 이론으로, 시간, 공간, 질량, 에너지의 관계를 설명하며 특수 상대성 이론과 일반 상대성 이론으로 나뉩니다."
+            },
+            {
+                term: "특수 상대성 이론 (Special Relativity)",
+                definition: "관성 좌표계에서 빛의 속도는 모든 관측자에게 동일하며, 물리 법칙은 모든 관성 좌표계에서 동일하게 적용된다는 이론입니다."
+            },
+            {
+                term: "일반 상대성 이론 (General Relativity)",
+                definition: "중력을 시공간의 휘어짐으로 설명하는 이론으로, 질량과 에너지가 시공간을 휘게 하고, 이 휘어진 시공간이 물체의 움직임을 결정합니다."
+            },
+            {
+                term: "양자역학 (Quantum Mechanics)",
+                definition: "원자 및 아원자 입자 수준에서 물질과 에너지의 행동을 설명하는 물리학 분야입니다. 입자의 파동-입자 이중성, 불확정성 원리 등이 주요 개념입니다."
+            },
+            {
+                term: "불확정성 원리 (Uncertainty Principle)",
+                definition: "양자역학의 기본 원리 중 하나로, 입자의 위치와 운동량(또는 에너지와 시간)을 동시에 정확하게 측정할 수 없다는 원리입니다."
+            },
+            {
+                term: "열역학 법칙 (Laws of Thermodynamics)",
+                definition: "에너지, 일, 열, 엔트로피의 관계를 다루는 물리학 법칙입니다."
+            },
+            {
+                term: "열역학 제1법칙 (Energy Conservation)",
+                definition: "에너지 보존 법칙으로, 고립계의 총 에너지는 일정하게 유지되며, 에너지는 형태를 바꿀 수 있지만 생성되거나 소멸되지 않습니다."
+            },
+            {
+                term: "열역학 제2법칙 (Entropy)",
+                definition: "엔트로피 증가의 법칙으로, 고립계의 총 엔트로피는 시간이 지남에 따라 증가하거나 일정하게 유지되며, 자연 현상은 무질서도가 증가하는 방향으로 진행됩니다."
+            },
+            {
+                term: "열역학 제3법칙 (Absolute Zero)",
+                definition: "절대 0도(0 K)에 가까워질수록 계의 엔트로피는 최소값에 가까워진다는 법칙입니다. 절대 0도에서는 모든 원자의 운동이 멈춥니다."
+            },
+            {
+                term: "전자기학 (Electromagnetism)",
+                definition: "전기와 자기 현상을 통합하여 설명하는 물리학 분야입니다. 전자기파의 존재와 특성을 설명하는 맥스웰 방정식이 핵심입니다."
+            },
+            {
+                term: "패러데이의 전자기 유도 법칙 (Faraday's Law of Induction)",
+                definition: "자기장의 변화가 전압(기전력)을 유도한다는 법칙입니다. 발전기, 변압기 등의 작동 원리입니다."
+            },
+            {
+                term: "훌리히의 법칙 (Hooke's Law)",
+                definition: "용수철과 같은 탄성체가 변형될 때 가해지는 힘은 변형된 길이에 비례한다는 법칙입니다. $F = -kx$로 표현됩니다."
+            },
+            {
+                term: "보일의 법칙 (Boyle's Law)",
+                definition: "온도가 일정할 때, 일정량의 기체의 부피는 압력에 반비례한다는 법칙입니다. $PV = k$로 표현됩니다."
+            },
+            {
+                term: "가우스의 법칙 (Gauss's Law)",
+                definition: "닫힌 표면을 통과하는 전기 선속은 그 표면 안에 있는 총 전하량에 비례한다는 법칙입니다. 전자기학의 기본 방정식 중 하나입니다."
+            },
+            {
+                term: "쿨롱의 법칙 (Coulomb's Law)",
+                definition: "두 전하 사이에 작용하는 전기력은 두 전하의 곱에 비례하고 거리의 제곱에 반비례한다는 법칙입니다."
+            },
+            {
+                term: "슈뢰딩거 방정식 (Schrödinger Equation)",
+                definition: "양자역학에서 입자의 파동 함수가 시간에 따라 어떻게 변하는지를 설명하는 기본 방정식입니다."
+            },
+            {
+                term: "헤이징스 원리 (Huygens' Principle)",
+                definition: "파면의 각 점이 새로운 구면파의 발생원 역할을 하며, 이 모든 구면파들의 포락선이 새로운 파면을 형성한다는 원리입니다. 빛의 파동성을 설명하는 데 사용됩니다."
+            },
+            {
+                term: "브라운 운동 (Brownian Motion)",
+                definition: "액체나 기체 속의 미소 입자들이 불규칙하게 움직이는 현상으로, 주변 분자들의 무작위 충돌에 의해 발생합니다."
+            },
+            {
+                term: "헥셀의 법칙 (Hess's Law)",
+                definition: "화학 반응의 총 엔탈피 변화는 반응 경로에 관계없이 일정하다는 법칙입니다."
+            },
+            {
+                term: "로렌츠 변환 (Lorentz Transformation)",
+                definition: "특수 상대성 이론에서 서로 다른 관성 좌표계 사이의 시간과 공간 좌표를 변환하는 방정식입니다."
+            },
+            {
+                term: "캐번디시 실험 (Cavendish Experiment)",
+                definition: "1798년 헨리 캐번디시가 지구의 밀도와 질량을 측정하고, 만유인력 상수 $G$를 정밀하게 결정하기 위해 수행한 실험입니다."
+            },
+            {
+                term: "이중 슬릿 실험 (Double-slit Experiment)",
+                definition: "빛이나 전자가 두 개의 좁은 슬릿을 통과할 때 파동의 간섭 무늬를 형성하는 현상을 보여주는 실험으로, 양자역학의 파동-입자 이중성을 명확히 보여줍니다."
+            }
+        ];
+
+        // Get references to DOM elements
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const searchResultsDiv = document.getElementById('searchResults');
+
+        /**
+         * Performs the search based on the input value and displays results.
+         */
+        function performSearch() {
+            const query = searchInput.value.toLowerCase().trim(); // Get search query and convert to lowercase
+            searchResultsDiv.innerHTML = ''; // Clear previous results
+
+            if (query === '') {
+                // If query is empty, display all data
+                displayResults(physicsData);
+                return;
+            }
+
+            // Filter physics data based on the query
+            const filteredResults = physicsData.filter(item =>
+                item.term.toLowerCase().includes(query) ||
+                item.definition.toLowerCase().includes(query)
+            );
+
+            displayResults(filteredResults);
+        }
+
+        /**
+         * Displays the given array of results in the searchResultsDiv.
+         * @param {Array<Object>} results - An array of physics data objects to display.
+         */
+        function displayResults(results) {
+            if (results.length === 0) {
+                // Display a message if no results are found
+                const noResultsDiv = document.createElement('div');
+                noResultsDiv.className = 'no-results';
+                noResultsDiv.textContent = '검색 결과가 없습니다.';
+                searchResultsDiv.appendChild(noResultsDiv);
+                return;
+            }
+
+            // Create and append a card for each result
+            results.forEach(item => {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+
+                const termElement = document.createElement('h3');
+                termElement.className = 'result-term';
+                termElement.textContent = item.term;
+
+                const definitionElement = document.createElement('p');
+                definitionElement.className = 'result-definition';
+                definitionElement.textContent = item.definition;
+
+                resultCard.appendChild(termElement);
+                resultCard.appendChild(definitionElement);
+                searchResultsDiv.appendChild(resultCard);
+            });
+        }
+
+        // Event Listeners
+        searchButton.addEventListener('click', performSearch); // Search on button click
+        searchInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                performSearch(); // Search on Enter key press
+            } else {
+                // Optional: Live search as user types (uncomment if desired)
+                // performSearch();
+            }
+        });
+
+        // Initial display: Show all terms when the page loads
+        window.onload = () => {
+            performSearch();
+        };
+    </script>
+</body>
+</html>
